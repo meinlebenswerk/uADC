@@ -1,20 +1,15 @@
-const { Transform } = require('stream')
+const { Transform, Readable } = require('stream')
 
 /**
- * Emit data every number of bytes
+ * Parses the uADC-Serial Stream and outputs raw data
  * @extends Transform
- * @param {Object} options parser options object
+ * @param {Object} options parser options
  * @param {Number} options.length the number of samples in each transmission
- * @summary A transform stream that emits data as a buffer after a specific number of bytes are received. Runs in O(n) time.
- * @example
-const SerialPort = require('serialport')
-const ByteLength = require('@serialport/parser-byte-length')
-const port = new SerialPort('/dev/tty-usbserial1')
-const parser = port.pipe(new ByteLength({length: 8}))
-parser.on('data', console.log) // will have 8 bytes per data event
+ * @summary A transform stream that emits data as a buffer after a specific number of bytes are received.
  */
-class uADCParser extends Transform {
+class uADCStreamParser extends Transform {
   constructor(options = {}) {
+    options.objectMode = true
     super(options)
 
     if (typeof options.length !== 'number') {
@@ -25,16 +20,29 @@ class uADCParser extends Transform {
       throw new TypeError('"length" is not greater than 0')
     }
 
+    this.nSamples = options.length
     this.sdlength = options.length*2
     this.framelength = 2 + this.sdlength + 2;
 
     this.position = 0
-    this.buffer = Buffer.alloc(this.sdlength)
 
     this.receiveBuffer = Buffer.alloc(0);
     this.sampleRate = 0
   }
-  
+
+  _parseSamples(frame){
+    let data = {
+      samples: [],
+      sampleRate: this.sampleRate
+    }
+
+    for(let i=0; i<this.nSamples; i++){
+      data.samples.push(frame.readUInt16LE(i*2));
+    }
+
+    return data
+  }
+
   _transform(chunk, encoding, cb) {
     //Note: calling cb basically requests more data.
     let cursor = 0
@@ -50,7 +58,7 @@ class uADCParser extends Transform {
       let new_cursor = this.receiveBuffer.indexOf(0xbd, cursor)
 
       if(new_cursor == -1){
-        console.log('stalling')
+        //console.log('stalling')
         this.receiveBuffer = Buffer.alloc(0)
         cb()
         return
@@ -72,7 +80,7 @@ class uADCParser extends Transform {
         let new_cursor = this.receiveBuffer.indexOf(0xbd, cursor+1)
 
         if(new_cursor == -1){
-          console.log('stalling')
+          //console.log('stalling')
           this.receiveBuffer = Buffer.alloc(0)
           cb()
           return
@@ -91,12 +99,14 @@ class uADCParser extends Transform {
         // console.log("end __inv_frm__")
       }
 
-      let frameData = this.receiveBuffer.slice(cursor, cursor+this.framelength)
+      let frameData = this.receiveBuffer.slice(cursor + 1, cursor+this.framelength)
       //console.log(this.receiveBuffer.length, cursor, frameData.length)
-      this.push(frameData.slice(1, this.sdlength+1))
+      //this.push(frameData.slice(1, this.sdlength+1))
+      let output_data = this._parseSamples(frameData)
+      this.push(output_data)
 
       //calculate sampleRate as a rolling-Average.
-      this.sampleRate += (64/frameData.readUInt16LE(this.sdlength))*Math.pow(10, 6)
+      this.sampleRate += (64/frameData.readUInt16BE(this.sdlength))*Math.pow(10, 6)
       this.sampleRate /= 2
 
       //increment the cursor, so the search is faster:
@@ -105,11 +115,12 @@ class uADCParser extends Transform {
   }
 
   _flush(cb) {
-    this.push(this.buffer.slice(0, this.position))
-    this.buffer = Buffer.alloc(this.sdlength)
+    this.receiveBuffer = Buffer.alloc(0)
     cb()
   }
 
 }
 
-module.exports = uADCParser
+module.exports = {
+  uADCStreamParser : uADCStreamParser
+}

@@ -4,8 +4,8 @@
   "description": "",
   "main": "uADCParser.js",
   "scripts": {},
-  "author": "Jan Eckert",
-  "license": "ISC",
+  "author": "meinlebenswerk",
+  "license": "MIT",
   "dependencies": {
     "serialport": "^7.1.5"
   }
