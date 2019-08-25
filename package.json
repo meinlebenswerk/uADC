@@ -6,7 +6,7 @@
   "scripts": {},
   "author": "meinlebenswerk",
   "license": "MIT",
-  "dependencies": {
+  "dev-dependencies": {
     "serialport": "^7.1.5"
   }
 }
