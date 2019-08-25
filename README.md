@@ -62,7 +62,7 @@ Also sometimes I don't get any data at all... This me be an issue with my BaudRa
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License
 
 ## Acknowledgments
 
