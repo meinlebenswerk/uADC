@@ -1,0 +1,12 @@
+{
+  "name": "uADC",
+  "version": "1.0.0",
+  "description": "",
+  "main": "uADCParser.js",
+  "scripts": {},
+  "author": "Jan Eckert",
+  "license": "ISC",
+  "dependencies": {
+    "serialport": "^7.1.5"
+  }
+}
