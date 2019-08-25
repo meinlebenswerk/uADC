@@ -23,7 +23,7 @@ The uADC-Module exports a Parser (uADCParser), which you can use in your project
 const SerialPort = require('serialport')
 const port = new SerialPort('COM7', { baudRate: 1000000})
 
-const uADC = require('./uADC');
+const uADC = require('uADC');
 
 const NSAMPLES = 64
 
