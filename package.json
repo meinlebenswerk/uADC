@@ -2,7 +2,7 @@
   "name": "uadc",
   "version": "1.0.0",
   "description": "",
-  "main": "uADCParser.js",
+  "main": "uADC.js",
   "scripts": {},
   "author": "meinlebenswerk",
   "license": "MIT",

@@ -48,7 +48,7 @@ The sample-data object looks like this:
 
 Sometimes, the synchronization doesn't properly work, leading to a lot of missed packets, I am working on fixing that.
 
-Also sometimes I don't get any data at all... This me be an issue with my BaudRate and setup, but so far I don't know. There is a fix for that though, just unplug your MCU and restart the application, if this doesn't help, just keep restarting the application... I know this is not very much of a fix, but I think i partially has to do with the sync-issue.
+Also sometimes I don't get any data at all... This me be an issue with my BaudRate and setup, but so far I don't know. There is a fix for that though, just unplug your MCU and restart the application, if that doesn't help, just keep restarting the application... I know this is not very much of a fix, but I think it partially has to do with the sync-issue.
 
 ## Built around
 
